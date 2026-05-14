@@ -6,214 +6,789 @@
   <title>Energy Investments Toolkit</title>
   <style>
     :root {
-      --bg: #ffffff;
+      --bg: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
       --card: #ffffff;
       --text: #0f172a;
+      --text-light: #475569;
       --muted: #64748b;
       --border: #e2e8f0;
       --accent: #2563eb;
-      --radius: 16px;
-      --shadow: 0 10px 25px rgba(0,0,0,0.06);
+      --accent-hover: #1d4ed8;
+      --accent-light: #dbeafe;
+      --success: #16a34a;
+      --warning: #ea580c;
+      --radius: 20px;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.12);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    * { box-sizing: border-box; }
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
       background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 15px rgba(15, 23, 42, 0.05);
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), #0891b2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), #0891b2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 64px 32px;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      margin-bottom: 80px;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 10px 16px;
+      background: var(--accent-light);
+      color: var(--accent);
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 20px;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text-light);
+      max-width: 700px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #0891b2);
+      color: white;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent-light);
+      transform: translateY(-2px);
+    }
+
+    /* Stats Section */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+      padding: 40px;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    /* Grid Section */
+    .section-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 12px;
       color: var(--text);
     }
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 32px;
-    }
-
-    .header {
-      margin-bottom: 28px;
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 40px;
-      letter-spacing: -0.03em;
-    }
-
-    .header p {
-      margin-top: 8px;
+    .section-subtitle {
+      font-size: 16px;
       color: var(--muted);
-      font-size: 15px;
+      margin-bottom: 40px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      margin-bottom: 80px;
     }
 
     .card {
       display: block;
       text-decoration: none;
       color: inherit;
-      border: 1px solid var(--border);
       background: var(--card);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 32px;
       box-shadow: var(--shadow);
-      transition: all 0.15s ease;
-      min-height: 180px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), #0891b2);
+      opacity: 0;
+      transition: var(--transition);
     }
 
     .card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-8px);
       border-color: var(--accent);
+      box-shadow: var(--shadow-lg);
     }
 
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 11px;
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      padding: 8px 12px;
+      background: var(--accent-light);
+      color: var(--accent);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
       text-transform: uppercase;
-      color: var(--muted);
-      letter-spacing: 0.08em;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .card-number {
+      font-size: 48px;
+      font-weight: 900;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(8, 145, 178, 0.1));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      line-height: 1;
     }
 
     .card h3 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: -0.02em;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--text);
+      letter-spacing: -0.01em;
     }
 
     .card p {
-      margin-top: 10px;
-      font-size: 14px;
+      font-size: 15px;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.6;
+      flex-grow: 1;
+      margin-bottom: 20px;
     }
 
     .card-footer {
-      margin-top: 16px;
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
     }
 
-    .tag {
+    .card-category {
+      font-size: 12px;
+      font-weight: 700;
       color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    .footer {
+    .card-arrow {
+      font-size: 18px;
+      color: var(--accent);
+      transition: var(--transition);
+      font-weight: 700;
+    }
+
+    .card:hover .card-arrow {
+      transform: translateX(4px);
+    }
+
+    .card-coming-soon {
+      background: linear-gradient(135deg, rgba(100, 116, 139, 0.03), rgba(100, 116, 139, 0.06));
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .card-coming-soon:hover {
+      transform: none;
+      box-shadow: var(--shadow);
+    }
+
+    /* Features Section */
+    .features {
+      background: white;
+      padding: 60px 40px;
+      border-radius: var(--radius);
+      margin-bottom: 80px;
+      box-shadow: var(--shadow);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
       margin-top: 40px;
-      font-size: 12px;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 16px;
+    }
+
+    .feature-icon {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(8, 145, 178, 0.1));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .feature-item h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .feature-item p {
+      font-size: 14px;
       color: var(--muted);
       line-height: 1.6;
     }
 
-    @media (max-width: 720px) {
-      .container { padding: 18px; }
+    /* Footer */
+    .footer {
+      background: var(--text);
+      color: white;
+      padding: 60px 32px;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .footer-disclaimer {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .container {
+        padding: 48px 24px;
+      }
+
+      .hero {
+        margin-bottom: 60px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 32px 16px;
+      }
+
+      .nav-container {
+        padding: 12px 16px;
+      }
+
+      .nav-links {
+        gap: 16px;
+        font-size: 12px;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .hero-cta {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+        padding: 24px;
+      }
+
+      .card {
+        padding: 24px;
+        min-height: auto;
+      }
+
+      .card-number {
+        font-size: 36px;
+      }
+
+      .features {
+        padding: 32px 24px;
+      }
+
+      .features-grid {
+        gap: 24px;
+      }
+
+      .footer {
+        padding: 40px 24px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-
-    <div class="header">
-      <h1>Energy Investments Toolkit</h1>
-      <p>Useful tools for quick investment and commercial evaluations.</p>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <div class="logo-icon">⚡</div>
+        EnergyTools
+      </a>
+      <ul class="nav-links">
+        <li><a href="#tools">Tools</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
     </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="container">
+    <div class="hero">
+      <div class="hero-badge">Professional Energy Investment Analysis</div>
+      <h1>Energy Investments Toolkit</h1>
+      <p>
+        A comprehensive suite of analytical tools designed for energy professionals. 
+        Make informed investment decisions with advanced financial modeling and risk analysis.
+      </p>
+      <div class="hero-cta">
+        <a href="#tools" class="btn btn-primary">Explore Tools</a>
+        <a href="#about" class="btn btn-secondary">Learn More</a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">5</div>
+        <div class="stat-label">Advanced Modules</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">24h</div>
+        <div class="stat-label">Real-time Analysis</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Client-side Computing</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">∞</div>
+        <div class="stat-label">Scenarios Testable</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Section -->
+  <section class="container" id="tools">
+    <h2 class="section-title">Analytical Modules</h2>
+    <p class="section-subtitle">All tools are provided for indicative analysis only. Verify all assumptions and outputs independently.</p>
 
     <div class="grid">
-
-      <a class="card" href="lcoe_dashboard.html">
-        <div class="card-top">
-          <span>Module 01</span>
-          <span>Economics</span>
-        </div>
+      <!-- Module 01 -->
+      <a href="lcoe_dashboard.html" class="card">
+        <div class="card-number">01</div>
+        <div class="card-badge">📊 Economics</div>
         <h3>LCOE Dashboard</h3>
-        <p>Calculate levelized cost of energy with CAPEX, OPEX, financing, yield and degradation.</p>
+        <p>Calculate levelized cost of energy with comprehensive analysis of CAPEX, OPEX, financing conditions, yield expectations, and degradation curves.</p>
         <div class="card-footer">
-          <span class="tag">Core Economics</span>
-          <span>Open →</span>
+          <span class="card-category">Core Economics</span>
+          <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <a class="card" href="sensitivity_dashboard.html">
-        <div class="card-top">
-          <span>Module 02</span>
-          <span>Risk</span>
-        </div>
+      <!-- Module 02 -->
+      <a href="sensitivity_dashboard.html" class="card">
+        <div class="card-number">02</div>
+        <div class="card-badge">📈 Risk</div>
         <h3>Sensitivity Dashboard</h3>
-        <p>Test downside, base and upside movements across key assumptions.</p>
+        <p>Perform comprehensive scenario analysis with downside, base case, and upside movements across all key financial and operational assumptions.</p>
         <div class="card-footer">
-          <span class="tag">Risk Analysis</span>
-          <span>Open →</span>
+          <span class="card-category">Risk Analysis</span>
+          <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <a class="card" href="project_financing_dashboard.html">
-        <div class="card-top">
-          <span>Module 03</span>
-          <span>Financing</span>
-        </div>
+      <!-- Module 03 -->
+      <a href="project_financing_dashboard.html" class="card">
+        <div class="card-number">03</div>
+        <div class="card-badge">💰 Financing</div>
         <h3>Project Financing Dashboard</h3>
-        <p>Run simplified project-finance analytics including NPV, IRR and DSCR.</p>
+        <p>Run simplified project-finance analytics including Net Present Value (NPV), Internal Rate of Return (IRR), and Debt Service Coverage Ratio (DSCR).</p>
         <div class="card-footer">
-          <span class="tag">Financing</span>
-          <span>Open →</span>
+          <span class="card-category">Financing</span>
+          <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <a class="card" href="battery_arbitrage_tool.html">
-        <div class="card-top">
-          <span>Module 04</span>
-          <span>Storage</span>
-        </div>
+      <!-- Module 04 -->
+      <a href="battery_arbitrage_tool.html" class="card">
+        <div class="card-number">04</div>
+        <div class="card-badge">🔋 Storage</div>
         <h3>Battery Arbitrage Tool</h3>
-        <p>Optimize storage dispatch based on price scenarios and constraints.</p>
+        <p>Optimize battery energy storage system dispatch based on realistic price scenarios and operational constraints with advanced algorithms.</p>
         <div class="card-footer">
-          <span class="tag">Storage</span>
-          <span>Open →</span>
+          <span class="card-category">Storage</span>
+          <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <a class="card" href="portfolio_price_sensitivity_dashboard.html">
-        <div class="card-top">
-          <span>Module 05</span>
-          <span>Portfolio</span>
-        </div>
-        <h3>Portfolio Power Price Sensitivity</h3>
-        <p>Analyze portfolio exposure to hourly price movements and volatility scenarios.</p>
+      <!-- Module 05 -->
+      <a href="portfolio_price_sensitivity_dashboard.html" class="card">
+        <div class="card-number">05</div>
+        <div class="card-badge">📊 Portfolio</div>
+        <h3>Portfolio Price Sensitivity</h3>
+        <p>Analyze portfolio-wide exposure to hourly electricity price movements and volatility scenarios with granular risk metrics.</p>
         <div class="card-footer">
-          <span class="tag">Portfolio</span>
-          <span>Open →</span>
+          <span class="card-category">Portfolio</span>
+          <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <div class="card">
-        <div class="card-top">
-          <span>Module 06</span>
-          <span>Reserved</span>
-        </div>
+      <!-- Module 06 - Coming Soon -->
+      <div class="card card-coming-soon">
+        <div class="card-number">06</div>
+        <div class="card-badge">🔮 Reserved</div>
         <h3>Add New Tool</h3>
-        <p>New tools may be added in the future.</p>
+        <p>Future modules may be added to expand analytical capabilities and address emerging energy sector challenges and opportunities.</p>
         <div class="card-footer">
-          <span class="tag">Coming Soon</span>
-          <span>—</span>
+          <span class="card-category">Coming Soon</span>
+          <span class="card-arrow">—</span>
         </div>
       </div>
-
     </div>
+  </section>
 
-    <div class="footer">
-      Disclaimer: these tools are provided for indicative analysis only. Use them with professional judgment and verify all assumptions and outputs independently.
+  <!-- Features Section -->
+  <section class="container" id="features">
+    <div class="features">
+      <h2 class="section-title">Why Choose EnergyTools?</h2>
+      
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div>
+            <h4>Instant Results</h4>
+            <p>All computations run directly in your browser. No server delays or data transmission.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div>
+            <h4>Complete Privacy</h4>
+            <p>Your data never leaves your device. No cloud storage or tracking.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">📱</div>
+          <div>
+            <h4>Fully Responsive</h4>
+            <p>Works seamlessly on desktop, tablet, and mobile devices.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">🎨</div>
+          <div>
+            <h4>Professional UI</h4>
+            <p>Modern, intuitive interface designed for energy professionals.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <div>
+            <h4>Advanced Analytics</h4>
+            <p>Sophisticated algorithms for optimization and financial modeling.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">🚀</div>
+          <div>
+            <h4>No Dependencies</h4>
+            <p>Pure HTML/CSS/JavaScript. Zero external libraries needed.</p>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
-  </div>
+  <!-- About Section -->
+  <section class="container" id="about">
+    <div class="features">
+      <h2 class="section-title">About This Toolkit</h2>
+      <p style="color: var(--muted); line-height: 1.8; max-width: 800px; margin: 20px 0;">
+        EnergyTools is a professional-grade suite of analytical applications designed for the energy sector. 
+        Whether you're evaluating solar, wind, battery storage, or hybrid projects, our tools provide 
+        comprehensive financial modeling, risk analysis, and optimization capabilities.
+      </p>
+      <p style="color: var(--muted); line-height: 1.8;">
+        <strong>Disclaimer:</strong> These tools are provided for indicative analysis only. 
+        Use them with professional judgment and verify all assumptions and outputs independently 
+        before making investment decisions. Energy projects involve complex technical and financial 
+        considerations that may not be fully captured by simplified modeling.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Contact</a>
+        <a href="#">GitHub</a>
+      </div>
+      <div class="footer-disclaimer">
+        EnergyTools is an independent analytical toolkit. All calculations are provided as-is without warranty.
+        Energy sector professionals should independently verify all results and assumptions.
+      </div>
+      <div class="footer-bottom">
+        © 2026 Energy Investments Toolkit. All rights reserved.
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
-
