@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Co-location Battery Value Calculator</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --panel: #ffffff;
+      --panel-2: #f5f7fb;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #0ea5e9;
+      --accent-2: #2563eb;
+      --good: #16a34a;
+      --bad: #dc2626;
+      --danger: #ef4444;
+      --border: rgba(0,0,0,0.08);
+      --shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 920px;
+      line-height: 1.5;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .back-main-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow: var(--shadow);
+      transition: 0.18s ease;
+    }
+
+    .back-main-link:hover {
+      transform: translateY(-1px);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 470px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, #ffffff, rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel-header {
+      padding: 20px 22px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      background: #ffffff;
+    }
+
+    .panel-header h2,
+    .chart-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .panel-header p,
+    .chart-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .inputs {
+      padding: 18px 22px 22px;
+      display: grid;
+      gap: 20px;
+    }
+
+    fieldset {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    legend {
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .input-wrap {
+      position: relative;
+      min-width: 0;
+    }
+
+    .prefix, .suffix {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    .prefix { left: 12px; }
+    .suffix { right: 12px; }
+
+    input, select {
+      width: 100%;
+      min-width: 0;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.15s ease, transform 0.12s ease;
+      font-family: inherit;
+    }
+
+    input[readonly] {
+      color: var(--muted);
+      background: #eef2f7;
+    }
+
+    .has-prefix input { padding-left: 42px; }
+    .has-suffix input, .has-suffix select { padding-right: 56px; }
+
+    input:focus, select:focus {
+      border-color: rgba(14,165,233,0.8);
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #07111f;
+    }
+    button.secondary {
+      background: rgba(0,0,0,0.05);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .right-col {
+      display: grid;
+      gap: 24px;
+      min-width: 0;
+    }
+
+    .summary {
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .kpi-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .big-card, .mini-card, .metric {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .big-card .label, .mini-card .label, .metric .title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      color: var(--muted);
+    }
+
+    .big-card .value {
+      margin-top: 12px;
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .big-card .note {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+      max-width: 62ch;
+    }
+
+    .mini-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .mini-card .value {
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: 10px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .metric .num {
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 10px;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .chart-card {
+      padding: 20px 22px 16px;
+      min-width: 0;
+    }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      height: 340px;
+      display: block;
+      background: linear-gradient(180deg, #ffffff, rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    .table-wrap {
+      padding: 0 22px 22px;
+      overflow: auto;
+      min-width: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: right;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    th:first-child, td:first-child { text-align: left; }
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(8px);
+    }
+
+    .positive { color: var(--good); font-weight: 700; }
+    .negative { color: var(--bad); font-weight: 700; }
+    .neutral { color: var(--muted); font-weight: 700; }
+
+    .footnote {
+      padding: 0 22px 22px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 13px;
+      padding: 0 22px 18px;
+      display: none;
+      font-weight: 700;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 1250px) {
+      .layout { grid-template-columns: minmax(0, 1fr); }
+      .kpi-main, .metrics { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    @media (max-width: 720px) {
+      .container {
+        padding: 16px;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      .layout {
+        display: block;
+        width: 100%;
+        max-width: calc(100vw - 32px);
+      }
+      .panel, .right-col, .hero > div {
+        width: 100%;
+        max-width: calc(100vw - 32px);
+      }
+      .grid-2 { grid-template-columns: minmax(0, 1fr); }
+      .hero { flex-direction: column; align-items: flex-start; }
+      .hero-actions { align-items: flex-start; }
+      .hero p { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <div>
+        <h1>Co-location Battery Value Calculator</h1>
+        <p>
+          Compare a renewable-only asset with a renewable + battery case. The calculator estimates whether adding a battery creates enough incremental value through curtailment recovery and optional grid arbitrage to justify its incremental cost.
+        </p>
+      </div>
+      <div class="hero-actions">
+        <a class="back-main-link" href="index.html">&larr; Main</a>
+        <div class="badge">Incremental Value - LCOS - NPV</div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <aside class="panel">
+        <div class="panel-header">
+          <h2>Inputs</h2>
+          <p>Set the renewable base case, battery size, charging mode, market prices and financing assumptions. Currency is fixed to EUR.</p>
+        </div>
+
+        <div class="inputs">
+          <fieldset>
+            <legend>Project Sizing</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="renewableTechnology">Renewable Technology</label>
+                <div class="input-wrap">
+                  <select id="renewableTechnology">
+                    <option value="solar">Solar PV</option>
+                    <option value="wind">Wind</option>
+                    <option value="hybrid">Hybrid</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="projectLifeYears">Project Life</label>
+                <div class="input-wrap has-suffix">
+                  <input id="projectLifeYears" type="number" min="1" step="1" value="25" />
+                  <span class="suffix">years</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="renewableCapacityMw">Renewable Capacity</label>
+                <div class="input-wrap has-suffix">
+                  <input id="renewableCapacityMw" type="number" min="0" step="0.1" value="100" />
+                  <span class="suffix">MW</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="gridConnectionMw">Grid Connection</label>
+                <div class="input-wrap has-suffix">
+                  <input id="gridConnectionMw" type="number" min="0" step="0.1" value="70" />
+                  <span class="suffix">MW</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Renewable Generation</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="renewableYieldMwhPerMw">Year 1 Yield</label>
+                <div class="input-wrap has-suffix">
+                  <input id="renewableYieldMwhPerMw" type="number" min="0" step="1" value="1700" />
+                  <span class="suffix">MWh/MW</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="annualDegradation">Annual Degradation</label>
+                <div class="input-wrap has-suffix">
+                  <input id="annualDegradation" type="number" min="0" max="100" step="0.01" value="0.4" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="baseCapturePrice">Base Capture Price</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">EUR</span>
+                  <input id="baseCapturePrice" type="number" min="0" step="0.1" value="55" />
+                  <span class="suffix">/MWh</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Curtailment</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="curtailmentRate">Curtailment Rate</label>
+                <div class="input-wrap has-suffix">
+                  <input id="curtailmentRate" type="number" min="0" max="100" step="0.1" value="8" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="curtailmentRecoveryRate">Curtailment Recovery</label>
+                <div class="input-wrap has-suffix">
+                  <input id="curtailmentRecoveryRate" type="number" min="0" max="100" step="0.1" value="85" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Battery Size</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="batteryPowerMw">Battery Power</label>
+                <div class="input-wrap has-suffix">
+                  <input id="batteryPowerMw" type="number" min="0" step="0.1" value="40" />
+                  <span class="suffix">MW</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="batteryDurationHours">Duration</label>
+                <div class="input-wrap has-suffix">
+                  <input id="batteryDurationHours" type="number" min="0" step="0.1" value="2" />
+                  <span class="suffix">hours</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="roundTripEfficiency">Round-Trip Efficiency</label>
+                <div class="input-wrap has-suffix">
+                  <input id="roundTripEfficiency" type="number" min="0" max="100" step="0.1" value="88" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="maxCyclesPerYear">Max Cycles</label>
+                <div class="input-wrap has-suffix">
+                  <input id="maxCyclesPerYear" type="number" min="0" step="1" value="250" />
+                  <span class="suffix">/year</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Charging Strategy</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="chargingMode">Charging Mode</label>
+                <div class="input-wrap">
+                  <select id="chargingMode">
+                    <option value="curtailedOnly">Curtailed renewable only</option>
+                    <option value="gridOnly">Grid only</option>
+                    <option value="curtailedAndGrid">Curtailed renewable + grid</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field grid-field">
+                <label for="gridCyclesPerYear">Grid Cycles</label>
+                <div class="input-wrap has-suffix">
+                  <input id="gridCyclesPerYear" type="number" min="0" step="1" value="80" />
+                  <span class="suffix">/year</span>
+                </div>
+              </div>
+              <div class="field grid-field">
+                <label for="gridChargePrice">Grid Charge Price</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">EUR</span>
+                  <input id="gridChargePrice" type="number" min="0" step="0.1" value="45" />
+                  <span class="suffix">/MWh</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Market Prices</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="dischargePrice">Discharge Price</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">EUR</span>
+                  <input id="dischargePrice" type="number" min="0" step="0.1" value="95" />
+                  <span class="suffix">/MWh</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="priceEscalation">Price Escalation</label>
+                <div class="input-wrap has-suffix">
+                  <input id="priceEscalation" type="number" min="-100" max="100" step="0.1" value="0" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Battery Costs</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="batteryCapexPerMwh">Battery CAPEX</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">EUR</span>
+                  <input id="batteryCapexPerMwh" type="number" min="0" step="1000" value="220000" />
+                  <span class="suffix">/MWh</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="batteryFixedOpexPerMw">Fixed OPEX</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">EUR</span>
+                  <input id="batteryFixedOpexPerMw" type="number" min="0" step="100" value="9000" />
+                  <span class="suffix">/MW/yr</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="batteryVariableOpexPerMwh">Variable OPEX</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">EUR</span>
+                  <input id="batteryVariableOpexPerMwh" type="number" min="0" step="0.1" value="2" />
+                  <span class="suffix">/MWh</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="opexInflation">OPEX Inflation</label>
+                <div class="input-wrap has-suffix">
+                  <input id="opexInflation" type="number" min="0" max="100" step="0.1" value="2" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Capital Structure</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="debtShare">Debt Share</label>
+                <div class="input-wrap has-suffix">
+                  <input id="debtShare" type="number" min="0" max="100" step="0.1" value="60" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="equityShare">Equity Share</label>
+                <div class="input-wrap has-suffix">
+                  <input id="equityShare" type="number" readonly value="40" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="costOfDebt">Cost of Debt</label>
+                <div class="input-wrap has-suffix">
+                  <input id="costOfDebt" type="number" min="0" max="100" step="0.1" value="5" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="costOfEquity">Cost of Equity</label>
+                <div class="input-wrap has-suffix">
+                  <input id="costOfEquity" type="number" min="0" max="100" step="0.1" value="10" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button class="primary" id="calcBtn" type="button">Calculate</button>
+            <button class="secondary" id="exampleBtn" type="button">Load Example</button>
+          </div>
+        </div>
+
+        <div class="error" id="errorBox"></div>
+      </aside>
+
+      <section class="right-col">
+        <div class="panel summary">
+          <div class="kpi-main">
+            <div class="big-card">
+              <div class="label">Battery Incremental NPV</div>
+              <div class="value" id="incrementalNpv">-</div>
+              <div class="note" id="summaryNote">Incremental NPV is calculated as battery CAPEX at year 0 plus discounted annual incremental cash flows.</div>
+            </div>
+            <div class="mini-grid">
+              <div class="mini-card">
+                <div class="label">Year 1 Incremental EBITDA</div>
+                <div class="value" id="year1Ebitda">-</div>
+              </div>
+              <div class="mini-card">
+                <div class="label">Payback Period</div>
+                <div class="value" id="paybackPeriod">-</div>
+              </div>
+              <div class="mini-card">
+                <div class="label">Battery LCOS</div>
+                <div class="value" id="batteryLcos">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="title">Curtailment Recovery Value</div>
+              <div class="num" id="curtailmentValue">-</div>
+            </div>
+            <div class="metric">
+              <div class="title">Grid Arbitrage Value</div>
+              <div class="num" id="gridArbitrageValue">-</div>
+            </div>
+            <div class="metric">
+              <div class="title">Recovered Curtailed Energy</div>
+              <div class="num" id="recoveredCurtailedEnergy">-</div>
+            </div>
+            <div class="metric">
+              <div class="title">Grid Discharged Energy</div>
+              <div class="num" id="gridDischargedEnergy">-</div>
+            </div>
+            <div class="metric">
+              <div class="title">Grid Connection / Renewable Capacity</div>
+              <div class="num" id="gridConnectionRatio">-</div>
+            </div>
+            <div class="metric">
+              <div class="title">Battery Discharged MWh</div>
+              <div class="num" id="batteryDischargedEnergy">-</div>
+            </div>
+            <div class="metric">
+              <div class="title">Blended Export Price Uplift</div>
+              <div class="num" id="capturePriceUplift">-</div>
+            </div>
+            <div class="metric">
+              <div class="title">Total Exported Energy</div>
+              <div class="num" id="totalExportedEnergy">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel chart-card">
+          <div class="chart-head">
+            <div>
+              <h3>Annual Incremental Value</h3>
+              <p>Bars show annual incremental revenue, battery OPEX as a negative cost, cash flow and discounted cash flow from adding the battery.</p>
+              <div class="legend-row">
+                <span class="legend-item"><span class="legend-swatch" style="background:#2563eb;"></span>Incremental Revenue</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:#94a3b8;"></span>Battery OPEX</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:#16a34a;"></span>Incremental Cash Flow</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:#0ea5e9;"></span>Discounted Cash Flow</span>
+              </div>
+            </div>
+            <div class="badge" id="chartBadge">No calculation yet</div>
+          </div>
+          <canvas id="valueChart" width="980" height="340"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Annual Schedule</h2>
+            <p>Year-by-year view of renewable generation, recovered curtailed energy, grid discharge, incremental revenue, OPEX and discounted cash flow.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Renewable Generation</th>
+                  <th>Curtailed Energy</th>
+                  <th>Curtailed Discharge</th>
+                  <th>Grid Discharge</th>
+                  <th>Incremental Revenue</th>
+                  <th>Battery OPEX</th>
+                  <th>Incremental Cash Flow</th>
+                  <th>Discount Factor</th>
+                  <th>Discounted Cash Flow</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleBody"></tbody>
+            </table>
+          </div>
+          <div class="footnote">
+            This simplified annual model estimates the incremental value of adding a battery to a renewable asset. Renewable charging is limited to curtailed energy to isolate incremental value versus the renewable-only case. Grid charging is modeled as simple annual arbitrage using average charge and discharge prices. Battery LCOS includes battery CAPEX and OPEX, while grid charging costs are netted inside grid arbitrage revenue. Payback uses cumulative undiscounted incremental cash flows. The model does not optimize hourly dispatch, state of charge, negative prices, grid constraints by hour, taxes, debt repayment, or battery degradation.
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const fields = {
+      renewableTechnology: $('renewableTechnology'),
+      renewableCapacityMw: $('renewableCapacityMw'),
+      gridConnectionMw: $('gridConnectionMw'),
+      projectLifeYears: $('projectLifeYears'),
+      renewableYieldMwhPerMw: $('renewableYieldMwhPerMw'),
+      annualDegradation: $('annualDegradation'),
+      baseCapturePrice: $('baseCapturePrice'),
+      curtailmentRate: $('curtailmentRate'),
+      curtailmentRecoveryRate: $('curtailmentRecoveryRate'),
+      batteryPowerMw: $('batteryPowerMw'),
+      batteryDurationHours: $('batteryDurationHours'),
+      roundTripEfficiency: $('roundTripEfficiency'),
+      maxCyclesPerYear: $('maxCyclesPerYear'),
+      chargingMode: $('chargingMode'),
+      gridCyclesPerYear: $('gridCyclesPerYear'),
+      gridChargePrice: $('gridChargePrice'),
+      dischargePrice: $('dischargePrice'),
+      priceEscalation: $('priceEscalation'),
+      batteryCapexPerMwh: $('batteryCapexPerMwh'),
+      batteryFixedOpexPerMw: $('batteryFixedOpexPerMw'),
+      batteryVariableOpexPerMwh: $('batteryVariableOpexPerMwh'),
+      opexInflation: $('opexInflation'),
+      debtShare: $('debtShare'),
+      equityShare: $('equityShare'),
+      costOfDebt: $('costOfDebt'),
+      costOfEquity: $('costOfEquity')
+    };
+
+    const example = {
+      renewableTechnology: 'solar',
+      renewableCapacityMw: 100,
+      gridConnectionMw: 70,
+      projectLifeYears: 25,
+      renewableYieldMwhPerMw: 1700,
+      annualDegradation: 0.4,
+      baseCapturePrice: 55,
+      curtailmentRate: 8,
+      curtailmentRecoveryRate: 85,
+      batteryPowerMw: 40,
+      batteryDurationHours: 2,
+      roundTripEfficiency: 88,
+      maxCyclesPerYear: 250,
+      chargingMode: 'curtailedAndGrid',
+      gridCyclesPerYear: 80,
+      gridChargePrice: 45,
+      dischargePrice: 95,
+      priceEscalation: 0,
+      batteryCapexPerMwh: 220000,
+      batteryFixedOpexPerMw: 9000,
+      batteryVariableOpexPerMwh: 2,
+      opexInflation: 2,
+      debtShare: 60,
+      costOfDebt: 5,
+      costOfEquity: 10
+    };
+
+    function parseNumber(input) {
+      return Number.parseFloat(input.value);
+    }
+
+    function formatNumber(value, decimals = 0) {
+      if (!Number.isFinite(value)) return '-';
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(value);
+    }
+
+    function formatCurrency(value, decimals = 0) {
+      if (!Number.isFinite(value)) return '-';
+      return `EUR ${formatNumber(value, decimals)}`;
+    }
+
+    function formatMwh(value, decimals = 0) {
+      return `${formatNumber(value, decimals)} MWh`;
+    }
+
+    function formatPercent(value, decimals = 1) {
+      return `${formatNumber(value, decimals)}%`;
+    }
+
+    function formatPrice(value, decimals = 2) {
+      return `${formatCurrency(value, decimals)}/MWh`;
+    }
+
+    function formatSignedPrice(value, decimals = 2) {
+      if (!Number.isFinite(value)) return '-';
+      const sign = value > 0 ? '+' : '';
+      return `${sign}${formatCurrency(value, decimals)}/MWh`;
+    }
+
+    function allowCurtailedCharging(mode) {
+      return mode === 'curtailedOnly' || mode === 'curtailedAndGrid';
+    }
+
+    function allowGridCharging(mode) {
+      return mode === 'gridOnly' || mode === 'curtailedAndGrid';
+    }
+
+    function updateConditionalInputs() {
+      const showGrid = allowGridCharging(fields.chargingMode.value);
+      document.querySelectorAll('.grid-field').forEach((node) => {
+        node.classList.toggle('hidden', !showGrid);
+      });
+    }
+
+    function updateEquityShare() {
+      const debtShare = parseNumber(fields.debtShare);
+      fields.equityShare.value = Number.isFinite(debtShare) ? formatNumber(Math.max(0, 100 - debtShare), 1) : '';
+    }
+
+    function getInputs() {
+      const debtShare = parseNumber(fields.debtShare) / 100;
+      const equityShare = 1 - debtShare;
+      return {
+        renewableTechnology: fields.renewableTechnology.value,
+        renewableCapacityMw: parseNumber(fields.renewableCapacityMw),
+        gridConnectionMw: parseNumber(fields.gridConnectionMw),
+        projectLifeYears: parseNumber(fields.projectLifeYears),
+        renewableYieldMwhPerMw: parseNumber(fields.renewableYieldMwhPerMw),
+        annualDegradation: parseNumber(fields.annualDegradation) / 100,
+        baseCapturePrice: parseNumber(fields.baseCapturePrice),
+        curtailmentRate: parseNumber(fields.curtailmentRate) / 100,
+        curtailmentRecoveryRate: parseNumber(fields.curtailmentRecoveryRate) / 100,
+        batteryPowerMw: parseNumber(fields.batteryPowerMw),
+        batteryDurationHours: parseNumber(fields.batteryDurationHours),
+        roundTripEfficiency: parseNumber(fields.roundTripEfficiency) / 100,
+        maxCyclesPerYear: parseNumber(fields.maxCyclesPerYear),
+        chargingMode: fields.chargingMode.value,
+        gridCyclesPerYear: parseNumber(fields.gridCyclesPerYear),
+        gridChargePrice: parseNumber(fields.gridChargePrice),
+        dischargePrice: parseNumber(fields.dischargePrice),
+        priceEscalation: parseNumber(fields.priceEscalation) / 100,
+        batteryCapexPerMwh: parseNumber(fields.batteryCapexPerMwh),
+        batteryFixedOpexPerMw: parseNumber(fields.batteryFixedOpexPerMw),
+        batteryVariableOpexPerMwh: parseNumber(fields.batteryVariableOpexPerMwh),
+        opexInflation: parseNumber(fields.opexInflation) / 100,
+        debtShare,
+        equityShare,
+        costOfDebt: parseNumber(fields.costOfDebt) / 100,
+        costOfEquity: parseNumber(fields.costOfEquity) / 100
+      };
+    }
+
+    function validate(inputs) {
+      const errors = [];
+      Object.entries(inputs).forEach(([key, value]) => {
+        if (typeof value === 'number' && !Number.isFinite(value)) errors.push(`${key} must be a valid number.`);
+      });
+      if (inputs.renewableCapacityMw <= 0) errors.push('Renewable capacity must be greater than zero.');
+      if (inputs.gridConnectionMw <= 0) errors.push('Grid connection must be greater than zero.');
+      if (!Number.isInteger(inputs.projectLifeYears) || inputs.projectLifeYears < 1) errors.push('Project life must be a whole number greater than zero.');
+      if (inputs.renewableYieldMwhPerMw <= 0) errors.push('Year 1 yield must be greater than zero.');
+      if (inputs.annualDegradation < 0 || inputs.annualDegradation >= 1) errors.push('Annual degradation must be between 0% and 100% (excluded).');
+      if (inputs.curtailmentRate < 0 || inputs.curtailmentRate > 1) errors.push('Curtailment rate must be between 0% and 100%.');
+      if (inputs.curtailmentRecoveryRate < 0 || inputs.curtailmentRecoveryRate > 1) errors.push('Curtailment recovery must be between 0% and 100%.');
+      if (inputs.batteryPowerMw <= 0) errors.push('Battery power must be greater than zero.');
+      if (inputs.batteryDurationHours <= 0) errors.push('Battery duration must be greater than zero.');
+      if (inputs.roundTripEfficiency <= 0 || inputs.roundTripEfficiency > 1) errors.push('Round-trip efficiency must be between 0% and 100%.');
+      if (inputs.maxCyclesPerYear < 0 || inputs.gridCyclesPerYear < 0) errors.push('Cycle assumptions must be zero or greater.');
+      if ([inputs.baseCapturePrice, inputs.gridChargePrice, inputs.dischargePrice, inputs.batteryCapexPerMwh, inputs.batteryFixedOpexPerMw, inputs.batteryVariableOpexPerMwh].some(v => v < 0)) errors.push('Price and cost assumptions must be zero or greater.');
+      if (inputs.priceEscalation < -1) errors.push('Price escalation cannot be lower than -100%.');
+      if (inputs.opexInflation < 0 || inputs.opexInflation >= 1) errors.push('OPEX inflation must be between 0% and 100% (excluded).');
+      if (inputs.debtShare < 0 || inputs.debtShare > 1) errors.push('Debt share must be between 0% and 100%.');
+      if (inputs.costOfDebt < 0 || inputs.costOfEquity < 0) errors.push('Cost of debt and cost of equity must be zero or greater.');
+      return errors;
+    }
+
+    function calculateWacc(inputs) {
+      return inputs.debtShare * inputs.costOfDebt + inputs.equityShare * inputs.costOfEquity;
+    }
+
+    function calculateYearlySchedule(inputs) {
+      const wacc = calculateWacc(inputs);
+      const grossYear1 = inputs.renewableCapacityMw * inputs.renewableYieldMwhPerMw;
+      const batteryCapacityMwh = inputs.batteryPowerMw * inputs.batteryDurationHours;
+      const maxAnnualBatteryDischargeMwh = batteryCapacityMwh * inputs.maxCyclesPerYear;
+      const maxAnnualBatteryChargeMwh = maxAnnualBatteryDischargeMwh / inputs.roundTripEfficiency;
+      const rows = [];
+
+      for (let year = 1; year <= inputs.projectLifeYears; year++) {
+        const generation = grossYear1 * Math.pow(1 - inputs.annualDegradation, year - 1);
+        const baseCapturePrice = inputs.baseCapturePrice * Math.pow(1 + inputs.priceEscalation, year - 1);
+        const dischargePrice = inputs.dischargePrice * Math.pow(1 + inputs.priceEscalation, year - 1);
+        const gridChargePrice = inputs.gridChargePrice * Math.pow(1 + inputs.priceEscalation, year - 1);
+        const curtailedEnergy = generation * inputs.curtailmentRate;
+        const deliveredRenewableOnly = generation - curtailedEnergy;
+        const renewableOnlyRevenue = deliveredRenewableOnly * baseCapturePrice;
+        const recoverableCurtailedEnergy = curtailedEnergy * inputs.curtailmentRecoveryRate;
+        const curtailedCharge = allowCurtailedCharging(inputs.chargingMode)
+          ? Math.min(recoverableCurtailedEnergy, maxAnnualBatteryChargeMwh)
+          : 0;
+        const curtailedDischarge = curtailedCharge * inputs.roundTripEfficiency;
+        const curtailmentRecoveryRevenue = curtailedDischarge * dischargePrice;
+        const remainingBatteryDischargeCapacity = Math.max(maxAnnualBatteryDischargeMwh - curtailedDischarge, 0);
+        const potentialGridDischarge = batteryCapacityMwh * inputs.gridCyclesPerYear;
+        const gridDischarge = allowGridCharging(inputs.chargingMode)
+          ? Math.min(potentialGridDischarge, remainingBatteryDischargeCapacity)
+          : 0;
+        const gridCharge = gridDischarge / inputs.roundTripEfficiency;
+        const gridArbitrageNetRevenue = allowGridCharging(inputs.chargingMode)
+          ? gridDischarge * (dischargePrice - gridChargePrice / inputs.roundTripEfficiency)
+          : 0;
+        const batteryDischargedEnergy = curtailedDischarge + gridDischarge;
+        const batteryChargedEnergy = curtailedCharge + gridCharge;
+        const incrementalRevenue = curtailmentRecoveryRevenue + gridArbitrageNetRevenue;
+        const renewableDeliveredEnergyWithBattery = deliveredRenewableOnly + curtailedDischarge;
+        const totalExportedEnergyWithBattery = deliveredRenewableOnly + curtailedDischarge + gridDischarge;
+        const renewablePlusBatteryRevenue = renewableOnlyRevenue + incrementalRevenue;
+        const capturePriceWithBattery = totalExportedEnergyWithBattery > 0 ? renewablePlusBatteryRevenue / totalExportedEnergyWithBattery : 0;
+        const capturePriceUplift = capturePriceWithBattery - baseCapturePrice;
+        const batteryOpex = (inputs.batteryPowerMw * inputs.batteryFixedOpexPerMw + batteryDischargedEnergy * inputs.batteryVariableOpexPerMwh) * Math.pow(1 + inputs.opexInflation, year - 1);
+        const incrementalCashFlow = incrementalRevenue - batteryOpex;
+        const discountFactor = 1 / Math.pow(1 + wacc, year);
+        const discountedIncrementalCashFlow = incrementalCashFlow * discountFactor;
+        const discountedBatteryOpex = batteryOpex * discountFactor;
+        const discountedBatteryDischargedEnergy = batteryDischargedEnergy * discountFactor;
+
+        rows.push({
+          year,
+          generation,
+          curtailedEnergy,
+          deliveredRenewableOnly,
+          renewableOnlyRevenue,
+          recoverableCurtailedEnergy,
+          curtailedCharge,
+          curtailedDischarge,
+          curtailmentRecoveryRevenue,
+          remainingBatteryDischargeCapacity,
+          gridCharge,
+          gridDischarge,
+          gridArbitrageNetRevenue,
+          batteryChargedEnergy,
+          batteryDischargedEnergy,
+          incrementalRevenue,
+          renewableDeliveredEnergyWithBattery,
+          totalExportedEnergyWithBattery,
+          renewablePlusBatteryRevenue,
+          capturePriceWithBattery,
+          capturePriceUplift,
+          batteryOpex,
+          incrementalCashFlow,
+          discountFactor,
+          discountedIncrementalCashFlow,
+          discountedBatteryOpex,
+          discountedBatteryDischargedEnergy
+        });
+      }
+
+      return rows;
+    }
+
+    function calculateSummary(schedule, inputs) {
+      const first = schedule[0];
+      const batteryCapacityMwh = inputs.batteryPowerMw * inputs.batteryDurationHours;
+      const batteryCapex = batteryCapacityMwh * inputs.batteryCapexPerMwh;
+      const discountedCashFlow = schedule.reduce((sum, row) => sum + row.discountedIncrementalCashFlow, 0);
+      const discountedBatteryOpex = schedule.reduce((sum, row) => sum + row.discountedBatteryOpex, 0);
+      const discountedBatteryDischargedEnergy = schedule.reduce((sum, row) => sum + row.discountedBatteryDischargedEnergy, 0);
+      const incrementalNpv = -batteryCapex + discountedCashFlow;
+      const pvBatteryCosts = batteryCapex + discountedBatteryOpex;
+      const batteryLcos = discountedBatteryDischargedEnergy > 0 ? pvBatteryCosts / discountedBatteryDischargedEnergy : null;
+      let cumulativeCashFlow = -batteryCapex;
+      let paybackPeriod = null;
+      for (const row of schedule) {
+        const openingCashFlow = cumulativeCashFlow;
+        cumulativeCashFlow += row.incrementalCashFlow;
+        if (paybackPeriod === null && cumulativeCashFlow >= 0 && row.incrementalCashFlow > 0) {
+          paybackPeriod = row.year - 1 + Math.abs(openingCashFlow) / row.incrementalCashFlow;
+        }
+      }
+      const gridConnectionRatio = inputs.gridConnectionMw / inputs.renewableCapacityMw;
+
+      return {
+        batteryCapacityMwh,
+        batteryCapex,
+        incrementalNpv,
+        batteryLcos,
+        paybackPeriod,
+        gridConnectionRatio,
+        year1: first,
+        wacc: calculateWacc(inputs)
+      };
+    }
+
+    function renderResults(summary) {
+      const year1 = summary.year1;
+      $('incrementalNpv').textContent = formatCurrency(summary.incrementalNpv, 0);
+      $('year1Ebitda').textContent = formatCurrency(year1.incrementalCashFlow, 0);
+      $('paybackPeriod').textContent = summary.paybackPeriod === null ? 'Not paid back' : `${formatNumber(summary.paybackPeriod, 1)} years`;
+      $('batteryLcos').textContent = summary.batteryLcos === null ? '-' : formatPrice(summary.batteryLcos, 2);
+      $('curtailmentValue').textContent = formatCurrency(year1.curtailmentRecoveryRevenue, 0);
+      $('gridArbitrageValue').textContent = formatCurrency(year1.gridArbitrageNetRevenue, 0);
+      $('recoveredCurtailedEnergy').textContent = formatMwh(year1.curtailedDischarge, 0);
+      $('gridDischargedEnergy').textContent = formatMwh(year1.gridDischarge, 0);
+      $('gridConnectionRatio').textContent = `${formatNumber(summary.gridConnectionRatio, 2)}x`;
+      $('batteryDischargedEnergy').textContent = formatMwh(year1.batteryDischargedEnergy, 0);
+      $('capturePriceUplift').textContent = formatSignedPrice(year1.capturePriceUplift, 2);
+      $('totalExportedEnergy').textContent = formatMwh(year1.totalExportedEnergyWithBattery, 0);
+      $('summaryNote').textContent = `Battery CAPEX is ${formatCurrency(summary.batteryCapex, 0)}. Pre-tax WACC is ${formatPercent(summary.wacc * 100, 2)}. Year 1 incremental revenue is ${formatCurrency(year1.incrementalRevenue, 0)} before battery OPEX.`;
+      $('chartBadge').textContent = `Year 1 cash flow: ${formatCurrency(year1.incrementalCashFlow, 0)}`;
+    }
+
+    function renderTable(schedule) {
+      $('scheduleBody').innerHTML = schedule.map(row => `
+        <tr>
+          <td>${row.year}</td>
+          <td>${formatMwh(row.generation, 0)}</td>
+          <td>${formatMwh(row.curtailedEnergy, 0)}</td>
+          <td>${formatMwh(row.curtailedDischarge, 0)}</td>
+          <td>${formatMwh(row.gridDischarge, 0)}</td>
+          <td>${formatCurrency(row.incrementalRevenue, 0)}</td>
+          <td>${formatCurrency(row.batteryOpex, 0)}</td>
+          <td class="${row.incrementalCashFlow >= 0 ? 'positive' : 'negative'}">${formatCurrency(row.incrementalCashFlow, 0)}</td>
+          <td>${row.discountFactor.toFixed(4)}</td>
+          <td class="${row.discountedIncrementalCashFlow >= 0 ? 'positive' : 'negative'}">${formatCurrency(row.discountedIncrementalCashFlow, 0)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderChart(schedule) {
+      const canvas = $('valueChart');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const cssWidth = canvas.clientWidth || 980;
+      const cssHeight = 340;
+      canvas.width = cssWidth * dpr;
+      canvas.height = cssHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const width = cssWidth;
+      const height = cssHeight;
+      ctx.clearRect(0, 0, width, height);
+
+      const rows = schedule;
+      const margin = { top: 24, right: 20, bottom: 38, left: 72 };
+      const plotW = width - margin.left - margin.right;
+      const plotH = height - margin.top - margin.bottom;
+      const series = [
+        { key: 'incrementalRevenue', color: '#2563eb', value: row => row.incrementalRevenue },
+        { key: 'batteryOpex', color: '#94a3b8', value: row => -row.batteryOpex },
+        { key: 'incrementalCashFlow', color: '#16a34a', value: row => row.incrementalCashFlow },
+        { key: 'discountedIncrementalCashFlow', color: '#0ea5e9', value: row => row.discountedIncrementalCashFlow }
+      ];
+      const maxValue = Math.max(...rows.flatMap(row => series.map(s => Math.abs(s.value(row)))), 1) * 1.18;
+      const zeroY = margin.top + plotH / 2;
+
+      for (let i = -2; i <= 2; i++) {
+        const y = zeroY - (i / 2) * (plotH / 2);
+        ctx.beginPath();
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(width - margin.right, y);
+        ctx.strokeStyle = i === 0 ? 'rgba(15,23,42,0.28)' : 'rgba(0,0,0,0.08)';
+        ctx.lineWidth = i === 0 ? 1.4 : 1;
+        ctx.stroke();
+        const label = (i / 2) * maxValue;
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(formatNumber(label, 0), margin.left - 8, y + 4);
+      }
+
+      const stepX = plotW / rows.length;
+      const groupW = Math.min(34, stepX * 0.72);
+      const barW = Math.max(2, groupW / series.length);
+
+      rows.forEach((row, rowIndex) => {
+        const groupX = margin.left + stepX * rowIndex + (stepX - groupW) / 2;
+        series.forEach((item, seriesIndex) => {
+          const value = item.value(row);
+          const barH = (Math.abs(value) / maxValue) * (plotH / 2);
+          const x = groupX + barW * seriesIndex;
+          const y = value >= 0 ? zeroY - barH : zeroY;
+          ctx.fillStyle = item.color;
+          ctx.fillRect(x, y, Math.max(1, barW - 1), barH);
+        });
+
+        if (rows.length <= 15 || rowIndex === 0 || rowIndex === rows.length - 1 || rowIndex % Math.ceil(rows.length / 8) === 0) {
+          ctx.fillStyle = '#64748b';
+          ctx.font = '12px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(String(row.year), margin.left + stepX * rowIndex + stepX / 2, height - 10);
+        }
+      });
+    }
+
+    function showError(message) {
+      const box = $('errorBox');
+      if (message) {
+        box.style.display = 'block';
+        box.textContent = message;
+      } else {
+        box.style.display = 'none';
+        box.textContent = '';
+      }
+    }
+
+    function runCalculation() {
+      updateEquityShare();
+      const inputs = getInputs();
+      const errors = validate(inputs);
+      if (errors.length) {
+        showError(errors.join(' '));
+        return;
+      }
+      showError('');
+      const schedule = calculateYearlySchedule(inputs);
+      const summary = calculateSummary(schedule, inputs);
+      renderResults(summary);
+      renderChart(schedule);
+      renderTable(schedule);
+    }
+
+    function loadExample() {
+      Object.entries(example).forEach(([key, value]) => {
+        if (fields[key]) fields[key].value = value;
+      });
+      updateConditionalInputs();
+      updateEquityShare();
+      runCalculation();
+    }
+
+    function runSelfTests() {
+      const inputs = getInputs();
+      const errors = validate(inputs);
+      console.assert(errors.length === 0, 'Example inputs should validate');
+      const schedule = calculateYearlySchedule(inputs);
+      const summary = calculateSummary(schedule, inputs);
+      console.assert(schedule.length === inputs.projectLifeYears, 'Schedule length should match project life');
+      console.assert(Number.isFinite(summary.incrementalNpv), 'NPV should be numeric');
+      console.assert(summary.paybackPeriod === null || summary.paybackPeriod > 0, 'Payback should be positive or not paid back');
+      console.assert(summary.batteryLcos === null || summary.batteryLcos > 0, 'LCOS should be positive or unavailable');
+      console.assert(schedule.every(row => row.batteryDischargedEnergy <= summary.batteryCapacityMwh * inputs.maxCyclesPerYear + 0.0001), 'Discharged energy should respect max annual cycles');
+    }
+
+    $('calcBtn').addEventListener('click', runCalculation);
+    $('exampleBtn').addEventListener('click', loadExample);
+    fields.chargingMode.addEventListener('change', () => {
+      updateConditionalInputs();
+      runCalculation();
+    });
+    fields.debtShare.addEventListener('input', updateEquityShare);
+    window.addEventListener('resize', () => {
+      try {
+        const inputs = getInputs();
+        if (!validate(inputs).length) renderChart(calculateYearlySchedule(inputs));
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    loadExample();
+    runSelfTests();
+  </script>
+</body>
+</html>
