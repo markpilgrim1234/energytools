@@ -75,14 +75,14 @@
     }
 
     .logo-icon {
-      width: 32px;
-      height: 32px;
+      width: 44px;
+      height: 44px;
       background: linear-gradient(135deg, var(--accent), #0891b2);
-      border-radius: 10px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 0;
     }
 
     .nav-links {
@@ -148,7 +148,7 @@
       font-size: 18px;
       color: var(--text-light);
       max-width: 700px;
-      margin: 0 auto 32px;
+      margin: 24px auto 32px;
       line-height: 1.7;
     }
 
@@ -570,13 +570,22 @@
   <nav class="navbar">
     <div class="nav-container">
       <a href="#" class="logo">
-        <div class="logo-icon">⚡</div>
+        <div class="logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="24" height="24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="EnergyTools logo">
+            <defs>
+              <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2563eb"/>
+                <stop offset="100%" stop-color="#0891b2"/>
+              </linearGradient>
+            </defs>
+            <path d="M24 6 4 36h16l-4 22 36-44H36l8-8H24Z" fill="url(#logoGradient)"/>
+          </svg>
+        </div>
         EnergyTools
       </a>
       <ul class="nav-links">
         <li><a href="#tools">Tools</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#about">About</a></li>
+        <li><a href="#features">About</a></li>
       </ul>
     </div>
   </nav>
@@ -595,33 +604,12 @@
         <a href="#about" class="btn btn-secondary">Learn More</a>
       </div>
     </div>
-
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-value">5</div>
-        <div class="stat-label">Advanced Modules</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">24h</div>
-        <div class="stat-label">Real-time Analysis</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">100%</div>
-        <div class="stat-label">Client-side Computing</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">∞</div>
-        <div class="stat-label">Scenarios Testable</div>
-      </div>
-    </div>
   </section>
 
   <!-- Tools Section -->
   <section class="container" id="tools">
-    <h2 class="section-title">Analytical Modules</h2>
+    <h2 class="section-title">Analytical Tools</h2>
     <p class="section-subtitle">All tools are provided for indicative analysis only. Verify all assumptions and outputs independently.</p>
-
     <div class="grid">
       <!-- Module 01 -->
       <a href="lcoe_dashboard.html" class="card">
@@ -697,77 +685,33 @@
     </div>
   </section>
 
-  <!-- Features Section -->
+  <!-- About / Why Choose Section -->
   <section class="container" id="features">
     <div class="features">
-      <h2 class="section-title">Why Choose EnergyTools?</h2>
+      <h2 class="section-title">About & Why Choose EnergyTools</h2>
       
       <div class="features-grid">
         <div class="feature-item">
-          <div class="feature-icon">⚡</div>
+          <div class="feature-icon">🛠️</div>
           <div>
-            <h4>Instant Results</h4>
-            <p>All computations run directly in your browser. No server delays or data transmission.</p>
+            <h4>Simple yet powerful tool</h4>
+            <p>Clean interface and clear workflows to get the insights you need fast, without unnecessary complexity.</p>
           </div>
         </div>
 
         <div class="feature-item">
-          <div class="feature-icon">🔒</div>
+          <div class="feature-icon">✅</div>
           <div>
-            <h4>Complete Privacy</h4>
-            <p>Your data never leaves your device. No cloud storage or tracking.</p>
-          </div>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">📱</div>
-          <div>
-            <h4>Fully Responsive</h4>
-            <p>Works seamlessly on desktop, tablet, and mobile devices.</p>
-          </div>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">🎨</div>
-          <div>
-            <h4>Professional UI</h4>
-            <p>Modern, intuitive interface designed for energy professionals.</p>
-          </div>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">📊</div>
-          <div>
-            <h4>Advanced Analytics</h4>
-            <p>Sophisticated algorithms for optimization and financial modeling.</p>
-          </div>
-        </div>
-
-        <div class="feature-item">
-          <div class="feature-icon">🚀</div>
-          <div>
-            <h4>No Dependencies</h4>
-            <p>Pure HTML/CSS/JavaScript. Zero external libraries needed.</p>
+            <h4>Trusted by professionals</h4>
+            <p>Built for energy experts with reliable analysis and results that can support real project decisions.</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- About Section -->
-  <section class="container" id="about">
-    <div class="features">
-      <h2 class="section-title">About This Toolkit</h2>
-      <p style="color: var(--muted); line-height: 1.8; max-width: 800px; margin: 20px 0;">
-        EnergyTools is a professional-grade suite of analytical applications designed for the energy sector. 
-        Whether you're evaluating solar, wind, battery storage, or hybrid projects, our tools provide 
-        comprehensive financial modeling, risk analysis, and optimization capabilities.
-      </p>
-      <p style="color: var(--muted); line-height: 1.8;">
-        <strong>Disclaimer:</strong> These tools are provided for indicative analysis only. 
-        Use them with professional judgment and verify all assumptions and outputs independently 
-        before making investment decisions. Energy projects involve complex technical and financial 
-        considerations that may not be fully captured by simplified modeling.
+      <p style="color: var(--muted); line-height: 1.8; max-width: 800px; margin: 24px auto 0;">
+        <strong>Disclaimer:</strong> These tools are provided for indicative analysis only.
+        Use them with professional judgment and verify all assumptions and results independently.
+        Energy project considerations may not be fully captured by simplified modeling.
       </p>
     </div>
   </section>
@@ -779,7 +723,6 @@
         <a href="#">Privacy Policy</a>
         <a href="#">Terms of Use</a>
         <a href="#">Contact</a>
-        <a href="#">GitHub</a>
       </div>
       <div class="footer-disclaimer">
         EnergyTools is an independent analytical toolkit. All calculations are provided as-is without warranty.
