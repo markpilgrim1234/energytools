@@ -426,6 +426,26 @@
       display: none;
     }
 
+    @media (min-width: 1251px) {
+      .input-panel {
+        position: sticky;
+        top: 24px;
+        max-height: calc(100vh - 48px);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .input-panel .panel-header,
+      .input-panel .error {
+        flex-shrink: 0;
+      }
+
+      .input-panel .inputs {
+        overflow-y: auto;
+        min-height: 0;
+      }
+    }
+
     @media (max-width: 1250px) {
       .layout { grid-template-columns: minmax(0, 1fr); }
       .kpi-main, .metrics { grid-template-columns: minmax(0, 1fr); }
@@ -469,7 +489,7 @@
     </section>
 
     <div class="layout">
-      <aside class="panel">
+      <aside class="panel input-panel">
         <div class="panel-header">
           <h2>Inputs</h2>
           <p>Set the renewable base case, battery size, charging mode, market prices and financing assumptions. Currency is fixed to EUR.</p>
@@ -500,13 +520,6 @@
                 <label for="renewableCapacityMw">Renewable Capacity</label>
                 <div class="input-wrap has-suffix">
                   <input id="renewableCapacityMw" type="number" min="0" step="0.1" value="100" />
-                  <span class="suffix">MW</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="gridConnectionMw">Grid Connection</label>
-                <div class="input-wrap has-suffix">
-                  <input id="gridConnectionMw" type="number" min="0" step="0.1" value="70" />
                   <span class="suffix">MW</span>
                 </div>
               </div>
@@ -552,7 +565,7 @@
                 </div>
               </div>
               <div class="field">
-                <label for="curtailmentRecoveryRate">Curtailment Recovery</label>
+                <label for="curtailmentRecoveryRate">% Curtailment captured by BESS</label>
                 <div class="input-wrap has-suffix">
                   <input id="curtailmentRecoveryRate" type="number" min="0" max="100" step="0.1" value="85" />
                   <span class="suffix">%</span>
@@ -769,10 +782,6 @@
               <div class="num" id="gridDischargedEnergy">-</div>
             </div>
             <div class="metric">
-              <div class="title">Grid Connection / Renewable Capacity</div>
-              <div class="num" id="gridConnectionRatio">-</div>
-            </div>
-            <div class="metric">
               <div class="title">Battery Discharged MWh</div>
               <div class="num" id="batteryDischargedEnergy">-</div>
             </div>
@@ -842,7 +851,6 @@
     const fields = {
       renewableTechnology: $('renewableTechnology'),
       renewableCapacityMw: $('renewableCapacityMw'),
-      gridConnectionMw: $('gridConnectionMw'),
       projectLifeYears: $('projectLifeYears'),
       renewableYieldMwhPerMw: $('renewableYieldMwhPerMw'),
       annualDegradation: $('annualDegradation'),
@@ -871,7 +879,6 @@
     const example = {
       renewableTechnology: 'solar',
       renewableCapacityMw: 100,
-      gridConnectionMw: 70,
       projectLifeYears: 25,
       renewableYieldMwhPerMw: 1700,
       annualDegradation: 0.4,
@@ -957,7 +964,6 @@
       return {
         renewableTechnology: fields.renewableTechnology.value,
         renewableCapacityMw: parseNumber(fields.renewableCapacityMw),
-        gridConnectionMw: parseNumber(fields.gridConnectionMw),
         projectLifeYears: parseNumber(fields.projectLifeYears),
         renewableYieldMwhPerMw: parseNumber(fields.renewableYieldMwhPerMw),
         annualDegradation: parseNumber(fields.annualDegradation) / 100,
@@ -990,12 +996,11 @@
         if (typeof value === 'number' && !Number.isFinite(value)) errors.push(`${key} must be a valid number.`);
       });
       if (inputs.renewableCapacityMw <= 0) errors.push('Renewable capacity must be greater than zero.');
-      if (inputs.gridConnectionMw <= 0) errors.push('Grid connection must be greater than zero.');
       if (!Number.isInteger(inputs.projectLifeYears) || inputs.projectLifeYears < 1) errors.push('Project life must be a whole number greater than zero.');
       if (inputs.renewableYieldMwhPerMw <= 0) errors.push('Year 1 yield must be greater than zero.');
       if (inputs.annualDegradation < 0 || inputs.annualDegradation >= 1) errors.push('Annual degradation must be between 0% and 100% (excluded).');
       if (inputs.curtailmentRate < 0 || inputs.curtailmentRate > 1) errors.push('Curtailment rate must be between 0% and 100%.');
-      if (inputs.curtailmentRecoveryRate < 0 || inputs.curtailmentRecoveryRate > 1) errors.push('Curtailment recovery must be between 0% and 100%.');
+      if (inputs.curtailmentRecoveryRate < 0 || inputs.curtailmentRecoveryRate > 1) errors.push('Curtailment captured by BESS must be between 0% and 100%.');
       if (inputs.batteryPowerMw <= 0) errors.push('Battery power must be greater than zero.');
       if (inputs.batteryDurationHours <= 0) errors.push('Battery duration must be greater than zero.');
       if (inputs.roundTripEfficiency <= 0 || inputs.roundTripEfficiency > 1) errors.push('Round-trip efficiency must be between 0% and 100%.');
@@ -1111,7 +1116,6 @@
           paybackPeriod = row.year - 1 + Math.abs(openingCashFlow) / row.incrementalCashFlow;
         }
       }
-      const gridConnectionRatio = inputs.gridConnectionMw / inputs.renewableCapacityMw;
 
       return {
         batteryCapacityMwh,
@@ -1119,7 +1123,6 @@
         incrementalNpv,
         batteryLcos,
         paybackPeriod,
-        gridConnectionRatio,
         year1: first,
         wacc: calculateWacc(inputs)
       };
@@ -1135,7 +1138,6 @@
       $('gridArbitrageValue').textContent = formatCurrency(year1.gridArbitrageNetRevenue, 0);
       $('recoveredCurtailedEnergy').textContent = formatMwh(year1.curtailedDischarge, 0);
       $('gridDischargedEnergy').textContent = formatMwh(year1.gridDischarge, 0);
-      $('gridConnectionRatio').textContent = `${formatNumber(summary.gridConnectionRatio, 2)}x`;
       $('batteryDischargedEnergy').textContent = formatMwh(year1.batteryDischargedEnergy, 0);
       $('capturePriceUplift').textContent = formatSignedPrice(year1.capturePriceUplift, 2);
       $('totalExportedEnergy').textContent = formatMwh(year1.totalExportedEnergyWithBattery, 0);
@@ -1277,6 +1279,16 @@
 
     $('calcBtn').addEventListener('click', runCalculation);
     $('exampleBtn').addEventListener('click', loadExample);
+    Object.values(fields).forEach((field) => {
+      if (field instanceof HTMLInputElement && !field.readOnly) {
+        field.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            runCalculation();
+          }
+        });
+      }
+    });
     fields.chargingMode.addEventListener('change', () => {
       updateConditionalInputs();
       runCalculation();
