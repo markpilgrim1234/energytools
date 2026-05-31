@@ -75,6 +75,34 @@
       white-space: nowrap;
       box-shadow: var(--shadow);
     }
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .back-main-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow: var(--shadow);
+      transition: 0.18s ease;
+    }
+
+    .back-main-link:hover {
+      transform: translateY(-1px);
+    }
 
     .layout {
       display: grid;
@@ -438,6 +466,7 @@
       .shell { padding: 16px; }
       .grid-2 { grid-template-columns: 1fr; }
       .hero { flex-direction: column; align-items: flex-start; }
+      .hero-actions { align-items: flex-start; }
     }
   </style>
 </head>
@@ -451,7 +480,10 @@
           from price-level and volatility presets. The tool estimates an economically rational hourly charge/discharge schedule, daily gross margin and annualized revenue.
         </p>
       </div>
-      <div class="badge">Dispatch • Spread Capture • Daily Margin</div>
+      <div class="hero-actions">
+        <a class="back-main-link" href="index.html">&larr; Main</a>
+        <div class="badge">Dispatch • Spread Capture • Daily Margin</div>
+      </div>
     </section>
 
     <div class="layout">

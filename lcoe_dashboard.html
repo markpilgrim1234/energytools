@@ -67,6 +67,34 @@
       font-size: 13px;
       white-space: nowrap;
     }
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .back-main-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow: var(--shadow);
+      transition: 0.18s ease;
+    }
+
+    .back-main-link:hover {
+      transform: translateY(-1px);
+    }
 
     .layout {
       display: grid;
@@ -115,6 +143,12 @@
       gap: 14px;
     }
 
+    .sensitivity-fieldset {
+      padding-top: 24px;
+      margin-top: 8px;
+      border-top: 2px solid rgba(15,23,42,0.16);
+    }
+
     legend {
       font-weight: 700;
       font-size: 13px;
@@ -125,6 +159,12 @@
     }
 
     .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .grid-4 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
@@ -176,6 +216,10 @@
       transform: translateY(-1px);
     }
 
+    input:invalid {
+      border-color: rgba(239,68,68,0.45);
+    }
+
     .actions {
       display: flex;
       gap: 12px;
@@ -202,6 +246,58 @@
       background: rgba(0,0,0,0.05);
       color: var(--text);
       border: 1px solid var(--border);
+    }
+
+    .section-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, rgba(14,165,233,0.16), rgba(37,99,235,0.16));
+      color: #0f172a;
+      border: 1px solid rgba(37,99,235,0.22);
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(37,99,235,0.10);
+    }
+
+    .copy-btn.is-copied {
+      background: rgba(14,165,233,0.10);
+      color: #0c4a6e;
+      border-color: rgba(14,165,233,0.30);
+    }
+
+    .year-zero td {
+      background: rgba(37,99,235,0.05);
+      font-weight: 700;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
     }
 
     .right-col {
@@ -360,6 +456,10 @@
       line-height: 1.5;
     }
 
+    .delta-positive { color: var(--danger); font-weight: 700; }
+    .delta-negative { color: #16a34a; font-weight: 700; }
+    .delta-neutral { color: var(--muted); font-weight: 700; }
+
     .error {
       color: var(--danger);
       font-size: 13px;
@@ -370,12 +470,14 @@
     @media (max-width: 1180px) {
       .layout { grid-template-columns: 1fr; }
       .kpi-main, .metrics { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 680px) {
       .container { padding: 16px; }
-      .grid-2 { grid-template-columns: 1fr; }
+      .grid-2, .grid-4 { grid-template-columns: 1fr; }
       .hero { flex-direction: column; align-items: flex-start; }
+      .hero-actions { align-items: flex-start; }
     }
   </style>
 </head>
@@ -385,18 +487,20 @@
       <div>
         <h1>LCOE Dashboard</h1>
         <p>
-          Enter CAPEX and OPEX on a EUR/MW basis, installed capacity in MW, financing assumptions, year 1 yield per MW,
-          annual degradation, annual OPEX inflation, and plant life. The dashboard calculates total project costs, annual energy output, escalated OPEX, and the discounted LCOE.
+          LCOE (Levelized Cost of Energy) is a standard metric used to express the average cost of producing electricity over the life of an asset. This dashboard calculates LCOE based on installed capacity, year 1 yield, CAPEX, annual OPEX, capital structure, cost of debt and equity, annual degradation, OPEX inflation, and project life.
         </p>
       </div>
-      <div class="badge">Formula: LCOE = PV(Costs) / PV(Energy)</div>
+      <div class="hero-actions">
+        <a class="back-main-link" href="index.html">&larr; Main</a>
+        <div class="badge">Formula: LCOE = PV(Costs) / PV(Energy)</div>
+      </div>
     </section>
 
     <div class="layout">
       <aside class="panel">
         <div class="panel-header">
           <h2>Inputs</h2>
-          <p>All inputs and labels are in English. Currency is fixed to EUR.</p>
+          <p>Set the base-case assumptions below to calculate LCOE, then use the sensitivity section to stress the result with one-variable shocks. Currency is fixed to EUR.</p>
         </div>
 
         <div class="inputs">
@@ -411,10 +515,10 @@
                 </div>
               </div>
               <div class="field">
-                <label for="life">Plant Life</label>
+                <label for="yieldPerMw">Year 1 Yield</label>
                 <div class="input-wrap has-suffix">
-                  <input id="life" type="number" min="1" step="1" value="25" />
-                  <span class="suffix">years</span>
+                  <input id="yieldPerMw" type="number" min="0" step="1" value="1400" />
+                  <span class="suffix">MWh/MW</span>
                 </div>
               </div>
             </div>
@@ -487,10 +591,10 @@
             <legend>Energy Yield</legend>
             <div class="grid-2">
               <div class="field">
-                <label for="yieldPerMw">Year 1 Yield</label>
+                <label for="life">Plant Life</label>
                 <div class="input-wrap has-suffix">
-                  <input id="yieldPerMw" type="number" min="0" step="1" value="1400" />
-                  <span class="suffix">MWh/MW</span>
+                  <input id="life" type="number" min="1" step="1" value="25" />
+                  <span class="suffix">years</span>
                 </div>
               </div>
               <div class="field">
@@ -498,6 +602,40 @@
                 <div class="input-wrap has-suffix">
                   <input id="degradation" type="number" min="0" max="100" step="0.01" value="0.5" />
                   <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="sensitivity-fieldset">
+            <legend>Sensitivity</legend>
+            <div class="grid-4">
+              <div class="field">
+                <label for="rangeCapex">CAPEX Shock</label>
+                <div class="input-wrap has-suffix">
+                  <input id="rangeCapex" type="number" min="0" max="100" step="0.1" value="10" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="rangeOpex">OPEX Shock</label>
+                <div class="input-wrap has-suffix">
+                  <input id="rangeOpex" type="number" min="0" max="100" step="0.1" value="10" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="rangeYield">Yield Shock</label>
+                <div class="input-wrap has-suffix">
+                  <input id="rangeYield" type="number" min="0" max="100" step="0.1" value="10" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="rangeWacc">WACC Shock</label>
+                <div class="input-wrap has-suffix">
+                  <input id="rangeWacc" type="number" min="0" max="100" step="0.1" value="1.0" />
+                  <span class="suffix">pts</span>
                 </div>
               </div>
             </div>
@@ -516,8 +654,8 @@
         <div class="panel summary">
           <div class="kpi-main">
             <div class="big-card">
-              <div class="label">Resulting LCOE</div>
-              <div class="value" id="lcoeValue">—</div>
+              <div class="label">Base-Case LCOE</div>
+              <div class="value" id="lcoeValue">-</div>
               <div class="note" id="lcoeNote">
                 Based on discounted project costs and discounted energy output over the full plant life.
               </div>
@@ -525,11 +663,11 @@
             <div class="mini-grid">
               <div class="mini-card">
                 <div class="label">Pre-tax WACC</div>
-                <div class="value" id="waccValue">—</div>
+                <div class="value" id="waccValue">-</div>
               </div>
               <div class="mini-card">
                 <div class="label">Total Lifetime Energy</div>
-                <div class="value" id="lifetimeEnergy">—</div>
+                <div class="value" id="lifetimeEnergy">-</div>
               </div>
             </div>
           </div>
@@ -537,19 +675,19 @@
           <div class="metrics">
             <div class="metric">
               <div class="title">PV of Costs</div>
-              <div class="num" id="pvCosts">—</div>
+              <div class="num" id="pvCosts">-</div>
             </div>
             <div class="metric">
               <div class="title">PV of Energy</div>
-              <div class="num" id="pvEnergy">—</div>
+              <div class="num" id="pvEnergy">-</div>
             </div>
             <div class="metric">
               <div class="title">Total CAPEX</div>
-              <div class="num" id="totalCapex">—</div>
+              <div class="num" id="totalCapex">-</div>
             </div>
             <div class="metric">
               <div class="title">Year 1 Energy</div>
-              <div class="num" id="year1Energy">—</div>
+              <div class="num" id="year1Energy">-</div>
             </div>
           </div>
         </div>
@@ -557,17 +695,62 @@
         <div class="panel chart-card">
           <div class="chart-head">
             <div>
-              <h3>Production Profile</h3>
-              <p>Nominal annual energy based on installed capacity multiplied by year 1 yield per MW, with annual degradation applied. Shaded bars show discounted energy used in the LCOE denominator.</p>
+              <h3>LCOE Cost Breakdown</h3>
+              <p>The chart breaks the levelized cost into CAPEX and discounted OPEX contributions, expressed directly in EUR/MWh.</p>
+              <div class="legend-row">
+                <span class="legend-item"><span class="legend-swatch" style="background:#2563eb;"></span>CAPEX component</span>
+                <span class="legend-item"><span class="legend-swatch" style="background:#0ea5e9;"></span>Discounted OPEX component</span>
+              </div>
             </div>
             <div class="badge" id="chartBadge">No calculation yet</div>
           </div>
           <canvas id="energyChart" width="980" height="300"></canvas>
         </div>
 
+        <div class="panel chart-card">
+          <div class="chart-head">
+            <div>
+              <h3>LCOE Sensitivity</h3>
+              <p>Each bar shows the low and high LCOE outcome for one variable at a time, while all other assumptions stay fixed at the base case. For example, the CAPEX bar only changes CAPEX and keeps yield, OPEX, WACC, degradation, inflation, and project life unchanged.</p>
+            </div>
+          </div>
+          <canvas id="sensitivityChart" width="980" height="340"></canvas>
+        </div>
+
         <div class="panel">
           <div class="panel-header">
-            <h2>Annual Schedule</h2>
+            <h2>Sensitivity Table</h2>
+            <p>Low and high cases are run one variable at a time against the same base-case LCOE.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Variable</th>
+                  <th>Low Case</th>
+                  <th>Low LCOE</th>
+                  <th>Delta vs Base</th>
+                  <th>Base LCOE</th>
+                  <th>High Case</th>
+                  <th>High LCOE</th>
+                  <th>Delta vs Base</th>
+                  <th>Total Swing</th>
+                </tr>
+              </thead>
+              <tbody id="sensitivityBody"></tbody>
+            </table>
+          </div>
+          <div class="footnote">
+            Method: one-way sensitivity. Only one assumption changes at a time. This section is meant to show which variables have the biggest impact on the base-case LCOE.
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="section-actions">
+              <h2>Annual Schedule</h2>
+              <button class="copy-btn" id="copyTableBtn" type="button">Copy Table</button>
+            </div>
             <p>Year-by-year view of yield, energy, discounted energy, escalated OPEX, and discounted OPEX. CAPEX is assumed at year 0.</p>
           </div>
           <div class="table-wrap">
@@ -579,6 +762,7 @@
                   <th>Nominal Energy (MWh)</th>
                   <th>Discount Factor</th>
                   <th>Discounted Energy (MWh)</th>
+                  <th>CAPEX</th>
                   <th>Escalated OPEX</th>
                   <th>Discounted OPEX</th>
                 </tr>
@@ -587,8 +771,8 @@
             </table>
           </div>
           <div class="footnote">
-            Assumptions in this tool: annual OPEX per MW escalates with the inflation input, no taxes, no debt sculpting or repayment waterfall, and a pre-tax WACC computed as
-            <strong>Debt % × Cost of Debt + Equity % × Cost of Equity</strong>. Yield is treated as <strong>MWh/MW</strong> for LCOE consistency.
+            Assumptions in this tool: CAPEX is treated at year 0, while annual energy and OPEX occur at year-end. Annual OPEX per MW escalates with the inflation input, no taxes are applied, and pre-tax WACC is computed as
+            <strong>Debt % x Cost of Debt + Equity % x Cost of Equity</strong>. Yield is treated as <strong>MWh/MW</strong> for LCOE consistency.
           </div>
         </div>
       </section>
@@ -609,8 +793,14 @@
       equityCost: $('equityCost'),
       yieldPerMw: $('yieldPerMw'),
       degradation: $('degradation'),
-      life: $('life')
+      life: $('life'),
+      rangeCapex: $('rangeCapex'),
+      rangeOpex: $('rangeOpex'),
+      rangeYield: $('rangeYield'),
+      rangeWacc: $('rangeWacc')
     };
+
+    const copyTableBtn = $('copyTableBtn');
 
     const example = {
       capacityMw: 50,
@@ -623,7 +813,11 @@
       equityCost: 10,
       yieldPerMw: 1400,
       degradation: 0.5,
-      life: 25
+      life: 25,
+      rangeCapex: 10,
+      rangeOpex: 10,
+      rangeYield: 10,
+      rangeWacc: 1
     };
 
     function formatNumber(value, decimals = 0) {
@@ -641,45 +835,70 @@
       return `${formatNumber(value, 2)}%`;
     }
 
+    function formatCellCurrency(value, decimals = 0) {
+      return formatCurrency(value, decimals);
+    }
+
+    function parseFiniteNumber(input) {
+      return Number.parseFloat(input.value);
+    }
+
     function readInputs() {
       return {
-        capacityMw: Number(fields.capacityMw.value),
-        capexPerMw: Number(fields.capexPerMw.value),
-        opexPerMw: Number(fields.opexPerMw.value),
-        annualInflation: Number(fields.annualInflation.value),
-        debtShare: Number(fields.debtShare.value),
-        equityShare: Number(fields.equityShare.value),
-        debtCost: Number(fields.debtCost.value),
-        equityCost: Number(fields.equityCost.value),
-        yieldPerMw: Number(fields.yieldPerMw.value),
-        degradation: Number(fields.degradation.value),
-        life: Number(fields.life.value)
+        capacityMw: parseFiniteNumber(fields.capacityMw),
+        capexPerMw: parseFiniteNumber(fields.capexPerMw),
+        opexPerMw: parseFiniteNumber(fields.opexPerMw),
+        annualInflation: parseFiniteNumber(fields.annualInflation),
+        debtShare: parseFiniteNumber(fields.debtShare),
+        equityShare: parseFiniteNumber(fields.equityShare),
+        debtCost: parseFiniteNumber(fields.debtCost),
+        equityCost: parseFiniteNumber(fields.equityCost),
+        yieldPerMw: parseFiniteNumber(fields.yieldPerMw),
+        degradation: parseFiniteNumber(fields.degradation),
+        life: parseFiniteNumber(fields.life),
+        rangeCapex: parseFiniteNumber(fields.rangeCapex),
+        rangeOpex: parseFiniteNumber(fields.rangeOpex),
+        rangeYield: parseFiniteNumber(fields.rangeYield),
+        rangeWacc: parseFiniteNumber(fields.rangeWacc)
       };
     }
 
     function validate(v) {
       const errors = [];
+      if (Object.values(v).some((value) => !Number.isFinite(value))) {
+        errors.push('All numeric inputs must contain valid numbers.');
+      }
       if (v.capacityMw <= 0) errors.push('Installed capacity must be greater than zero.');
       if (v.capexPerMw < 0) errors.push('CAPEX per MW must be zero or greater.');
       if (v.opexPerMw < 0) errors.push('Annual OPEX per MW must be zero or greater.');
       if (v.annualInflation < 0 || v.annualInflation >= 100) errors.push('Annual inflation on OPEX must be between 0% and 100% (excluded).');
       if (v.yieldPerMw <= 0) errors.push('Year 1 yield must be greater than zero.');
       if (v.life < 1) errors.push('Plant life must be at least 1 year.');
+      if (!Number.isInteger(v.life)) errors.push('Plant life must be a whole number of years.');
       if (v.degradation < 0 || v.degradation >= 100) errors.push('Annual degradation must be between 0% and 100% (excluded).');
       if (v.debtCost < 0 || v.equityCost < 0) errors.push('Cost of debt and cost of equity must be zero or greater.');
       if (v.debtShare < 0 || v.equityShare < 0) errors.push('Debt and equity shares must be zero or greater.');
+      if ([v.rangeCapex, v.rangeOpex, v.rangeYield, v.rangeWacc].some((value) => value < 0)) errors.push('Sensitivity ranges must be zero or greater.');
+      if (v.rangeYield >= 100) errors.push('Yield shock must be below 100%.');
       const capitalMix = v.debtShare + v.equityShare;
       if (Math.abs(capitalMix - 100) > 0.001) errors.push('Debt share plus equity share must equal 100%.');
       return errors;
     }
 
-    function calculateLCOE(v) {
-      const wacc = (v.debtShare / 100) * (v.debtCost / 100) + (v.equityShare / 100) * (v.equityCost / 100);
+    function deriveWaccRate(v) {
+      return (v.debtShare / 100) * (v.debtCost / 100) + (v.equityShare / 100) * (v.equityCost / 100);
+    }
+
+    function calculateLCOE(v, overrides = {}) {
+      const capexPerMw = overrides.capexPerMw ?? v.capexPerMw;
+      const opexPerMw = overrides.opexPerMw ?? v.opexPerMw;
+      const yieldPerMw = overrides.yieldPerMw ?? v.yieldPerMw;
+      const wacc = overrides.waccRate ?? deriveWaccRate(v);
       const deg = v.degradation / 100;
-      const totalCapex = v.capexPerMw * v.capacityMw;
-      const annualOpex = v.opexPerMw * v.capacityMw;
+      const totalCapex = capexPerMw * v.capacityMw;
+      const annualOpex = opexPerMw * v.capacityMw;
       const inflation = v.annualInflation / 100;
-      const year1Energy = v.yieldPerMw * v.capacityMw;
+      const year1Energy = yieldPerMw * v.capacityMw;
 
       let pvCosts = totalCapex;
       let pvEnergy = 0;
@@ -687,7 +906,7 @@
       const rows = [];
 
       for (let year = 1; year <= v.life; year++) {
-        const yieldThisYear = v.yieldPerMw * Math.pow(1 - deg, year - 1);
+        const yieldThisYear = yieldPerMw * Math.pow(1 - deg, year - 1);
         const nominalEnergy = yieldThisYear * v.capacityMw;
         const discountFactor = 1 / Math.pow(1 + wacc, year);
         const discountedEnergy = nominalEnergy * discountFactor;
@@ -710,7 +929,66 @@
       }
 
       const lcoe = pvCosts / pvEnergy;
-      return { wacc, totalCapex, annualOpex, year1Energy, pvCosts, pvEnergy, lifetimeEnergy, lcoe, rows, annualInflation: v.annualInflation };
+      const capexLcoe = totalCapex / pvEnergy;
+      const opexLcoe = (pvCosts - totalCapex) / pvEnergy;
+      return { wacc, totalCapex, annualOpex, year1Energy, pvCosts, pvEnergy, lifetimeEnergy, lcoe, capexLcoe, opexLcoe, rows, annualInflation: v.annualInflation };
+    }
+
+    function formatLcoe(value) {
+      return `EUR ${formatNumber(value, 2)}/MWh`;
+    }
+
+    function scenarioLabel(variable, value) {
+      switch (variable) {
+        case 'capexPerMw': return `${formatCurrency(value, 0)}/MW`;
+        case 'opexPerMw': return `${formatCurrency(value, 0)}/MW`;
+        case 'yieldPerMw': return `${formatNumber(value, 0)} MWh/MW`;
+        case 'waccRate': return formatRate(value * 100);
+        default: return formatNumber(value, 2);
+      }
+    }
+
+    function sensitivityLabel(row, base) {
+      switch (row.key) {
+        case 'capexPerMw':
+          return `${row.name} +/-${formatNumber(base.rangeCapex, 1)}%`;
+        case 'opexPerMw':
+          return `${row.name} +/-${formatNumber(base.rangeOpex, 1)}%`;
+        case 'yieldPerMw':
+          return `${row.name} +/-${formatNumber(base.rangeYield, 1)}%`;
+        case 'waccRate':
+          return `${row.name} +/-${formatNumber(base.rangeWacc, 1)} pts`;
+        default:
+          return row.name;
+      }
+    }
+
+    function runSensitivity(base) {
+      const baseModel = calculateLCOE(base);
+      const baseWaccRate = deriveWaccRate(base);
+      const items = [
+        { name: 'CAPEX', key: 'capexPerMw', lowValue: base.capexPerMw * (1 - base.rangeCapex / 100), highValue: base.capexPerMw * (1 + base.rangeCapex / 100) },
+        { name: 'OPEX', key: 'opexPerMw', lowValue: base.opexPerMw * (1 - base.rangeOpex / 100), highValue: base.opexPerMw * (1 + base.rangeOpex / 100) },
+        { name: 'Yield', key: 'yieldPerMw', lowValue: base.yieldPerMw * (1 - base.rangeYield / 100), highValue: base.yieldPerMw * (1 + base.rangeYield / 100) },
+        { name: 'WACC', key: 'waccRate', lowValue: Math.max(0, baseWaccRate - base.rangeWacc / 100), highValue: baseWaccRate + base.rangeWacc / 100 }
+      ].map((item) => {
+        const lowModel = calculateLCOE(base, { [item.key]: item.lowValue });
+        const highModel = calculateLCOE(base, { [item.key]: item.highValue });
+        const lowDelta = lowModel.lcoe - baseModel.lcoe;
+        const highDelta = highModel.lcoe - baseModel.lcoe;
+        return {
+          ...item,
+          baseLcoe: baseModel.lcoe,
+          lowLcoe: lowModel.lcoe,
+          highLcoe: highModel.lcoe,
+          lowDelta,
+          highDelta,
+          swing: Math.abs(highModel.lcoe - lowModel.lcoe),
+          impact: Math.max(Math.abs(lowDelta), Math.abs(highDelta))
+        };
+      }).sort((a, b) => b.impact - a.impact);
+
+      return { baseLcoe: baseModel.lcoe, items };
     }
 
     function renderSummary(input, result) {
@@ -722,22 +1000,165 @@
       $('totalCapex').textContent = formatCurrency(result.totalCapex, 0);
       $('year1Energy').textContent = `${formatNumber(result.year1Energy, 0)} MWh`;
       $('lcoeNote').textContent = `This result uses capacity of ${formatNumber(input.capacityMw, 2)} MW, year 1 yield of ${formatNumber(input.yieldPerMw, 2)} MWh/MW, annual OPEX inflation of ${formatRate(input.annualInflation)}, and a pre-tax WACC of ${formatRate(result.wacc * 100)}.`;
-      $('chartBadge').textContent = `Calculated over ${input.life} years`;
+      $('chartBadge').textContent = `Calculated over ${input.life} years | Year-0 CAPEX`;
     }
 
     function renderTable(input, result) {
       const body = $('scheduleBody');
-      body.innerHTML = result.rows.map(row => `
+      const yearZeroRow = `
+        <tr class="year-zero">
+          <td>0</td>
+          <td>-</td>
+          <td>-</td>
+          <td>1.0000</td>
+          <td>-</td>
+          <td>${formatCellCurrency(result.totalCapex, 0)}</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+      `;
+      const annualRows = result.rows.map(row => `
         <tr>
           <td>${row.year}</td>
           <td>${formatNumber(row.yieldThisYear, 2)}</td>
           <td>${formatNumber(row.nominalEnergy, 2)}</td>
           <td>${row.discountFactor.toFixed(4)}</td>
           <td>${formatNumber(row.discountedEnergy, 2)}</td>
-          <td>${formatCurrency(row.nominalOpex, 0)}</td>
-          <td>${formatCurrency(row.discountedOpex, 0)}</td>
+          <td>-</td>
+          <td>${formatCellCurrency(row.nominalOpex, 0)}</td>
+          <td>${formatCellCurrency(row.discountedOpex, 0)}</td>
         </tr>
       `).join('');
+      body.innerHTML = yearZeroRow + annualRows;
+    }
+
+    async function copyTableData() {
+      const headers = ['Year', 'Yield (MWh/MW)', 'Nominal Energy (MWh)', 'Discount Factor', 'Discounted Energy (MWh)', 'CAPEX', 'Escalated OPEX', 'Discounted OPEX'];
+      const rows = [...$('scheduleBody').querySelectorAll('tr')].map((row) =>
+        [...row.children].map((cell) => cell.textContent.trim()).join('\t')
+      );
+      const text = [headers.join('\t'), ...rows].join('\n');
+      await navigator.clipboard.writeText(text);
+      copyTableBtn.textContent = 'Copied';
+      copyTableBtn.classList.add('is-copied');
+      window.setTimeout(() => {
+        copyTableBtn.textContent = 'Copy Table';
+        copyTableBtn.classList.remove('is-copied');
+      }, 1600);
+    }
+
+    function sensitivityClass(value) {
+      if (value > 0.0001) return 'delta-positive';
+      if (value < -0.0001) return 'delta-negative';
+      return 'delta-neutral';
+    }
+
+    function signedLcoeDelta(value) {
+      const sign = value > 0 ? '+' : '';
+      return `${sign}${formatNumber(value, 2)}`;
+    }
+
+    function renderSensitivityTable(result) {
+      $('sensitivityBody').innerHTML = result.items.map((item) => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${scenarioLabel(item.key, item.lowValue)}</td>
+          <td>${formatLcoe(item.lowLcoe)}</td>
+          <td class="${sensitivityClass(item.lowDelta)}">${signedLcoeDelta(item.lowDelta)}</td>
+          <td>${formatLcoe(item.baseLcoe)}</td>
+          <td>${scenarioLabel(item.key, item.highValue)}</td>
+          <td>${formatLcoe(item.highLcoe)}</td>
+          <td class="${sensitivityClass(item.highDelta)}">${signedLcoeDelta(item.highDelta)}</td>
+          <td>${formatNumber(item.swing, 2)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSensitivityChart(result, baseInput) {
+      const canvas = $('sensitivityChart');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const cssWidth = canvas.clientWidth || 980;
+      const cssHeight = 340;
+      canvas.width = cssWidth * dpr;
+      canvas.height = cssHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const width = cssWidth;
+      const height = cssHeight;
+      ctx.clearRect(0, 0, width, height);
+
+      const rows = result.items;
+      const baseLcoe = result.baseLcoe;
+      const margin = { top: 24, right: 88, bottom: 34, left: 150 };
+      const plotW = width - margin.left - margin.right;
+      const plotH = height - margin.top - margin.bottom;
+      const minVal = Math.min(...rows.map((r) => Math.min(r.lowLcoe, r.highLcoe)), baseLcoe);
+      const maxVal = Math.max(...rows.map((r) => Math.max(r.lowLcoe, r.highLcoe)), baseLcoe);
+      const pad = (maxVal - minVal || 1) * 0.15;
+      const domainMin = minVal - pad;
+      const domainMax = maxVal + pad;
+      const x = (value) => margin.left + ((value - domainMin) / (domainMax - domainMin)) * plotW;
+      const rowH = plotH / rows.length;
+      const barH = Math.min(32, rowH * 0.56);
+
+      for (let i = 0; i <= 5; i++) {
+        const value = domainMin + ((domainMax - domainMin) / 5) * i;
+        const xpos = x(value);
+        ctx.beginPath();
+        ctx.moveTo(xpos, margin.top);
+        ctx.lineTo(xpos, margin.top + plotH);
+        ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(formatNumber(value, 1), xpos, height - 10);
+      }
+
+      const baseX = x(baseLcoe);
+      ctx.beginPath();
+      ctx.moveTo(baseX, margin.top - 4);
+      ctx.lineTo(baseX, margin.top + plotH + 4);
+      ctx.strokeStyle = '#0ea5e9';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      rows.forEach((row, index) => {
+        const cy = margin.top + rowH * index + rowH / 2;
+        const leftX = x(Math.min(row.lowLcoe, row.highLcoe));
+        const rightX = x(Math.max(row.lowLcoe, row.highLcoe));
+        const lowX = x(row.lowLcoe);
+        const highX = x(row.highLcoe);
+
+        ctx.fillStyle = '#dbeafe';
+        ctx.fillRect(leftX, cy - barH / 2, rightX - leftX, barH);
+        ctx.strokeStyle = 'rgba(37,99,235,0.18)';
+        ctx.strokeRect(leftX, cy - barH / 2, rightX - leftX, barH);
+
+        ctx.fillStyle = row.lowLcoe <= baseLcoe ? '#16a34a' : '#dc2626';
+        ctx.fillRect(Math.min(lowX, baseX), cy - barH / 2, Math.abs(baseX - lowX), barH);
+        ctx.fillStyle = row.highLcoe >= baseLcoe ? '#dc2626' : '#16a34a';
+        ctx.fillRect(Math.min(highX, baseX), cy - barH / 2, Math.abs(highX - baseX), barH);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '600 14px Inter, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(sensitivityLabel(row, baseInput), margin.left - 12, cy + 4);
+
+        ctx.fillStyle = '#334155';
+        ctx.font = '700 13px Inter, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(formatNumber(row.lowLcoe, 1), leftX - 8, cy + 4);
+        ctx.textAlign = 'left';
+        ctx.fillText(formatNumber(row.highLcoe, 1), rightX + 8, cy + 4);
+      });
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '800 16px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Base-case LCOE: ${formatLcoe(result.baseLcoe)}`, baseX, 16);
     }
 
     function renderChart(result) {
@@ -757,8 +1178,11 @@
       const margin = { top: 22, right: 20, bottom: 34, left: 58 };
       const plotW = width - margin.left - margin.right;
       const plotH = height - margin.top - margin.bottom;
-      const rows = result.rows;
-      const maxValue = Math.max(...rows.map(r => r.nominalEnergy), ...rows.map(r => r.discountedEnergy)) * 1.08;
+      const components = [
+        { label: 'CAPEX', value: result.capexLcoe, color: '#2563eb' },
+        { label: 'Discounted OPEX', value: result.opexLcoe, color: '#0ea5e9' }
+      ];
+      const maxValue = Math.max(...components.map(c => c.value), 1) * 1.25;
 
       ctx.strokeStyle = 'rgba(0,0,0,0.1)';
       ctx.lineWidth = 1;
@@ -784,58 +1208,22 @@
       ctx.strokeStyle = 'rgba(0,0,0,0.15)';
       ctx.stroke();
 
-      const stepX = plotW / Math.max(rows.length - 1, 1);
-      const barWidth = Math.max(6, Math.min(22, stepX * 0.45));
+      const stepX = plotW / components.length;
+      const barWidth = Math.min(140, stepX * 0.5);
 
-      rows.forEach((row, index) => {
-        const x = margin.left + stepX * index;
-        const yNom = margin.top + plotH - (row.nominalEnergy / maxValue) * plotH;
-        const yDisc = margin.top + plotH - (row.discountedEnergy / maxValue) * plotH;
-
-        ctx.fillStyle = 'rgba(37,99,235,0.2)';
-        ctx.fillRect(x - barWidth / 2, yDisc, barWidth, margin.top + plotH - yDisc);
-
-        if (index === 0) {
-          ctx.beginPath();
-          ctx.moveTo(x, yNom);
-        } else {
-          ctx.lineTo(x, yNom);
-        }
+      components.forEach((component, index) => {
+        const x = margin.left + stepX * index + stepX / 2;
+        const barHeight = (component.value / maxValue) * plotH;
+        const y = margin.top + plotH - barHeight;
+        ctx.fillStyle = component.color;
+        ctx.fillRect(x - barWidth / 2, y, barWidth, barHeight);
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '700 13px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(component.label, x, height - 10);
+        ctx.font = '800 14px Inter, sans-serif';
+        ctx.fillText(`EUR ${formatNumber(component.value, 2)}/MWh`, x, y - 10);
       });
-
-      ctx.strokeStyle = '#0ea5e9';
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-
-      rows.forEach((row, index) => {
-        const x = margin.left + stepX * index;
-        const yNom = margin.top + plotH - (row.nominalEnergy / maxValue) * plotH;
-        ctx.beginPath();
-        ctx.fillStyle = '#0ea5e9';
-        ctx.arc(x, yNom, 2.6, 0, Math.PI * 2);
-        ctx.fill();
-
-        if (rows.length <= 15 || index === 0 || index === rows.length - 1 || index % Math.ceil(rows.length / 8) === 0) {
-          ctx.fillStyle = '#64748b';
-          ctx.font = '12px Inter, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(String(row.year), x, height - 10);
-        }
-      });
-
-      ctx.fillStyle = '#475569';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText('Years', width - 54, height - 10);
-
-      ctx.fillStyle = '#0ea5e9';
-      ctx.fillRect(margin.left, 10, 12, 12);
-      ctx.fillStyle = 'rgba(234,240,255,0.95)';
-      ctx.fillText('Nominal energy', margin.left + 18, 20);
-      ctx.fillStyle = 'rgba(37,99,235,0.3)';
-      ctx.fillRect(margin.left + 128, 10, 12, 12);
-      ctx.fillStyle = 'rgba(234,240,255,0.95)';
-      ctx.fillText('Discounted energy', margin.left + 146, 20);
     }
 
     function showError(message) {
@@ -858,9 +1246,12 @@
       }
       showError('');
       const result = calculateLCOE(input);
+      const sensitivity = runSensitivity(input);
       renderSummary(input, result);
       renderTable(input, result);
       renderChart(result);
+      renderSensitivityTable(sensitivity);
+      renderSensitivityChart(sensitivity, input);
     }
 
     function loadExample() {
@@ -872,10 +1263,21 @@
 
     $('calcBtn').addEventListener('click', runCalculation);
     $('resetBtn').addEventListener('click', loadExample);
+    copyTableBtn.addEventListener('click', async () => {
+      try {
+        await copyTableData();
+      } catch (error) {
+        showError('Unable to copy the table data from this browser context.');
+      }
+    });
     window.addEventListener('resize', () => {
       const input = readInputs();
       const errors = validate(input);
-      if (!errors.length) renderChart(calculateLCOE(input));
+      if (!errors.length) {
+        const model = calculateLCOE(input);
+        renderChart(model);
+        renderSensitivityChart(runSensitivity(input), input);
+      }
     });
 
     loadExample();
